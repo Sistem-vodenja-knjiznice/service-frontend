@@ -33,7 +33,7 @@ const Register = () => {
     return (
         <Wrapper>
             <div>
-                <h2>Login</h2>
+                <h2>Register</h2>
                 <form onSubmit={register}>
                     <div className="mb-3">
                         <label className="form-label">Username</label>
