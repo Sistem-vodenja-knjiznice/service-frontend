@@ -61,7 +61,7 @@ const Books = () => {
             setBooks((prevBooks: any) =>
                 prevBooks.map((book: any) =>
                     book.id === id
-                        ? {...book, extend_count: Math.min((book.stock || 0) - 1, 0)} : book
+                        ? {...book, extend_count: Math.max((book.stock || 0) - 1, 0)} : book
                 )
             );
         }
