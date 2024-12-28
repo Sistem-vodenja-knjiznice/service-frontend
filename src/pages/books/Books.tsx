@@ -57,6 +57,13 @@ const Books = () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ user_id: userId, book_id: id })
             });
+
+            setBooks((prevBooks: any) =>
+                prevBooks.map((book: any) =>
+                    book.id === id
+                        ? {...book, extend_count: Math.min((book.stock || 0) - 1, 0)} : book
+                )
+            );
         }
     }
 
