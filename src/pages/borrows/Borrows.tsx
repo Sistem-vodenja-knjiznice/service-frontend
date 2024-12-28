@@ -15,7 +15,7 @@ const Borrows = () => {
         };
 
         getBorrows();
-    });
+    }, []);
 
     const return_borrow = async (id: number, user_id: number,book_id: number) => {
         if (window.confirm('Are you sure you want to return this book?')) {
@@ -48,7 +48,7 @@ const Borrows = () => {
                     ? {
                         ...borrow,
                         status: 'extended',
-                        extend_count: (borrow.extend_count || 0) + 2,
+                        extend_count: (borrow.extend_count || 0) + 1,
                         due_date: borrow.due_date
                             ? new Date(new Date(borrow.due_date).setDate(new Date(borrow.due_date).getDate() + 14)).toISOString().split('T')[0]
                             : null,

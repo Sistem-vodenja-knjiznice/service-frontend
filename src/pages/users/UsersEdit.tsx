@@ -24,7 +24,7 @@ const UsersEdit = () => {
         };
 
         fetchBook();
-    });
+    }, []);
 
     const submit = async (e: SyntheticEvent) => {
         e.preventDefault();

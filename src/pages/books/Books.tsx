@@ -36,7 +36,7 @@ const Books = () => {
         };
 
         getBooks();
-    });
+    }, []);
 
     const del = async (id: number) => {
         if (window.confirm('Are you sure you want to delete this book?')) {
@@ -52,11 +52,20 @@ const Books = () => {
 
     const borrow = async (id: number) => {
         if (window.confirm('Are you sure you want to borrow this book?')) {
-            await fetch(`${BASE_URL}/api/borrows/borrow`, {
+            const response = await fetch(`${BASE_URL}/api/borrows/borrow`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ user_id: userId, book_id: id })
             });
+
+            if (response.ok) {
+                setBooks((prevBooks: any) =>
+                    prevBooks.map((book: any) =>
+                        book.id === id
+                            ? {...book, stock: Math.max((book.stock || 0) - 1, 0)} : book
+                    )
+                );
+            }
         }
     }
 
