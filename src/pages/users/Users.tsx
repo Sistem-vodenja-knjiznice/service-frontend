@@ -14,7 +14,7 @@ const Users = () => {
         };
 
         getUsers();
-    });
+    }, []);
 
     const del = async (id: number) => {
         if (window.confirm('Are you sure you want to delete this user?')) {

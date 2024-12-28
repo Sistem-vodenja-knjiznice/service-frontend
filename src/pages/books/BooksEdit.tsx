@@ -29,7 +29,7 @@ const BooksEdit = () => {
 
         fetchBook();
 
-    });
+    }, []);
 
     const submit = async (e: SyntheticEvent) => {
         e.preventDefault();

@@ -15,7 +15,7 @@ const Borrows = () => {
         };
 
         getBorrows();
-    });
+    }, []);
 
     const return_borrow = async (id: number, user_id: number,book_id: number) => {
         if (window.confirm('Are you sure you want to return this book?')) {
