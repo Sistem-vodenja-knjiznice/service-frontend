@@ -1,0 +1,63 @@
+name: Build Docker Container & Push to DO Registry
+
+on:
+  workflow_call:
+  workflow_dispatch:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test_react_job:
+    uses: Sistem-vodenja-knjiznice/service-frontend/.github/workflows/test.yaml@main
+
+  build:
+    runs-on: ubuntu-latest
+    needs: [test_react_job]
+    env:
+      CLUSTER_NAME: k8s-1-31-1-do-4-fra1-rso
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Docker CLI
+        uses: docker/setup-buildx-action@v2
+
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DO_API_TOKEN_KEY }}
+
+      - name: Login to DigitalOcean Container Registry with short-lived token
+        run: doctl registry login --expiry-seconds 300
+
+      - name: Build React app Docker image
+        working-directory: .
+        run: |
+          docker build -f Dockerfile -t registry.digitalocean.com/rso-vaje/service-frontend:latest .
+          docker build -f Dockerfile -t registry.digitalocean.com/rso-vaje/service-frontend:${GITHUB_SHA::7} .
+
+      - name: Push React Docker image to DigitalOcean Container Registry
+        run: |
+          docker push registry.digitalocean.com/rso-vaje/service-frontend --all-tags
+
+      - name: K8s cluster kubeconfig file short-lived credentials
+        run: |
+          doctl kubernetes cluster kubeconfig save --expiry-seconds 300 ${{ env.CLUSTER_NAME }}
+
+      - name: Update deployment secrets for React app
+        run: |
+          cat << EOF >> .env.prod
+          ENV_ALLOWED_HOST=${{ secrets.ENV_ALLOWED_HOST }}
+          REACT_APP_API_BASE_URL=${{ secrets.REACT_APP_API_BASE_URL }}
+          EOF
+          kubectl delete secret react-k8s-frontend-prod-env --ignore-not-found
+          kubectl create secret generic react-k8s-frontend-prod-env --from-env-file=.env.prod
+
+      - name: Update React app deployment image in Kubernetes
+        run: |
+          kubectl set image deployment/service-frontend-deployment service-frontend=registry.digitalocean.com/rso-vaje/service-frontend:${GITHUB_SHA::7}
+
+      - name: Wait for rollout to finish
+        run: kubectl rollout status deployment/service-frontend-deployment
