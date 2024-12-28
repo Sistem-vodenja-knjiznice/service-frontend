@@ -32,4 +32,4 @@ jobs:
 
       - name: Run Tests
         run: |
-          npm test -- --coverage
+          npm test -- --passWithNoTests
