@@ -8,15 +8,17 @@ const mockBooks = [
     { id: 2, title: 'Book 2', author: 'Author 2', year: 2022, isbn: '0987654321', pages: 300, stock: 3 }
 ];
 
-global.fetch = jest.fn(() =>
-    Promise.resolve({
-        json: () => Promise.resolve({ data: { allBooks: mockBooks } })
-    })
-) as jest.Mock;
-
 describe('Books Component', () => {
     beforeEach(() => {
         localStorage.setItem('user_id', '1');
+        global.fetch = jest.fn((url) => {
+            if (url.includes('/delete')) {
+                return Promise.resolve({ ok: true });
+            }
+            return Promise.resolve({
+                json: () => Promise.resolve({ data: { allBooks: mockBooks } })
+            });
+        }) as jest.Mock;
     });
 
     afterEach(() => {
@@ -32,15 +34,13 @@ describe('Books Component', () => {
 
         await waitFor(() => {
             expect(screen.getByText('Book 1')).toBeInTheDocument();
-        });
-
-        await waitFor(() => {
             expect(screen.getByText('Book 2')).toBeInTheDocument();
         });
-
     });
 
     test('deletes a book', async () => {
+        window.confirm = jest.fn(() => true);
+
         render(
             <BrowserRouter>
                 <Books />
@@ -50,12 +50,6 @@ describe('Books Component', () => {
         await waitFor(() => {
             expect(screen.getByText('Book 1')).toBeInTheDocument();
         });
-
-        global.fetch = jest.fn(() =>
-            Promise.resolve({
-                ok: true
-            })
-        ) as jest.Mock;
 
         fireEvent.click(screen.getAllByText('Delete')[0]);
 
