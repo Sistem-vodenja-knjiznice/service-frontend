@@ -17,6 +17,18 @@ spec:
           image: registry.digitalocean.com/rso-vaje/service-frontend:latest
           ports:
             - containerPort: 80
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 80
+            initialDelaySeconds: 3
+            periodSeconds: 5
 
 ---
 apiVersion: v1
