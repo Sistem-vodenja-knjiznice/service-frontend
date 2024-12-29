@@ -14,7 +14,7 @@ const UsersEdit = () => {
     const BASE_URL = process.env.REACT_APP_API_BASE_URL || '';
 
     useEffect(() => {
-        const fetchBook = async () => {
+        const fetchUser = async () => {
             const response = await fetch(`${BASE_URL}/api/users/${id}`);
             const data = await response.json();
             setUsername(data.username);
@@ -23,7 +23,7 @@ const UsersEdit = () => {
             setSurname(data.surname);
         };
 
-        fetchBook();
+        fetchUser();
     }, []);
 
     const submit = async (e: SyntheticEvent) => {

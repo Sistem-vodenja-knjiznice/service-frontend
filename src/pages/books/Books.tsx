@@ -95,7 +95,11 @@ const Books = () => {
                         return (
                             <tr key={book.id}>
                                 <td>{book.id}</td>
-                                <td>{book.title}</td>
+                                <td>
+                                    <Link to={`/books/${book.id}`} className="text-decoration-none">
+                                        {book.title}
+                                    </Link>
+                                </td>
                                 <td>{book.author}</td>
                                 <td>{book.year}</td>
                                 <td>{book.pages}</td>
