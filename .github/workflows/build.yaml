@@ -55,9 +55,13 @@ jobs:
           kubectl delete secret react-k8s-frontend-prod-env --ignore-not-found
           kubectl create secret generic react-k8s-frontend-prod-env --from-env-file=.env.prod
 
-      - name: Update React app deployment image in Kubernetes
+      - name: Helm upgrade/install with the new image
         run: |
-          kubectl set image deployment/service-frontend-deployment service-frontend=registry.digitalocean.com/rso-vaje/service-frontend:${GITHUB_SHA::7}
+          helm upgrade --install frontend ./k8s/frontend \
+            --set image.tag=${GITHUB_SHA::7} \
+            --set env.secrets.name=django-k8s-frontend-prod-env \
+            --namespace default \
+            --wait --timeout 30s
 
       - name: Wait for rollout to finish
-        run: kubectl rollout status deployment/service-frontend-deployment
+        run: kubectl rollout status deployment/frontend

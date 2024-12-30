@@ -1,0 +1,60 @@
+# values.yaml
+
+replicaCount: 2
+
+image:
+  repository: registry.digitalocean.com/rso-vaje/service-frontend
+  tag: "latest"
+  pullPolicy: Always
+
+service:
+  type: ClusterIP
+  port: 80
+
+env:
+  secrets:
+    name: django-k8s-borrow-prod-env
+  variables:
+    - name: PORT
+      value: "80"
+
+probes:
+  livenessProbe:
+    httpGet:
+      path: /health
+      port: 80
+    initialDelaySeconds: 5
+    periodSeconds: 10
+  readinessProbe:
+    httpGet:
+      path: /health
+      port: 80
+    initialDelaySeconds: 3
+    periodSeconds: 5
+
+imagePullSecrets:
+  - name: registry-rso-vaje
+
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations: {}
+  hosts:
+    - host:
+      paths:
+        - path: /
+          pathType: Prefix
+          service:
+            port:
+              number: 80
+
+serviceAccount:
+  create: true
+  name: ""
+
+autoscaling:
+  enabled: false  # Set to true to enable Horizontal Pod Autoscaler (HPA)
+  minReplicas: 1  # Minimum number of replicas
+  maxReplicas: 5  # Maximum number of replicas
+  targetCPUUtilizationPercentage: 80
