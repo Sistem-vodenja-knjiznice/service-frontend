@@ -16,7 +16,7 @@ read, update, and delete tasks.
 1. Clone the repository.
 2. Set up environment variables in the `.env` file.
 3. Install `npm install`.
-4. Start the server using `npm start`.
+4. Start the server using `npm run dev`.
 
 ## Running Tests
 
